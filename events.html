@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Events - Event Ticket Booking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+    header {
+      background-color: #99b122;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 15px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .filters {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .filters input,
+    .filters select {
+      padding: 10px;
+      margin: 10px 5px;
+      width: 200px;
+    }
+    .event-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .event-card {
+      background-color: white;
+      padding: 20px;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .event-card h3 {
+      margin-top: 0;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+
+    /* Dark mode */
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+    .dark-mode .event-card {
+      background-color: #1f1f1f;
+      color: white;
+    }
+    .dark-mode input,
+    .dark-mode select,
+    .dark-mode button {
+      background-color: #333;
+      color: white;
+    }
+
+    /* Chatbot help button */
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      padding: 10px 15px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+    .chatbot a {
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Scroll to top */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      padding: 10px 15px;
+      border: none;
+      background: #28a745;
+      color: white;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  
+  <header>
+    <h1>EVENT TICKET BOOKING</h1>
+    <h2> Event Listings</h2>
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="logout.html">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Centered Toggle Dark Mode Button -->
+  <div style="display: flex; justify-content: center; margin-top: 15px;">
+    <button onclick="toggleDarkMode()" id="darkModeBtn" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+      Toggle Dark Mode
+    </button>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb" style="text-align:center; margin: 10px 0;">
+    <a href="index.html"></a> 
+  </div>
+
+  <!-- Filters -->
+  <main>
+    <div class="filters">
+      <input type="text" id="searchBar" placeholder="Search Events" onkeyup="searchEvents()">
+      <select id="eventTypeFilter" onchange="filterEvents()">
+        <option value="">All Categories</option>
+        <option value="Music / Concert">Music / Concert</option>
+        <option value="Technology / Conference">Technology / Conference</option>
+        <option value="Entertainment / Comedy">Entertainment / Comedy</option>
+        <option value="Food / Festival">Food / Festival</option>
+        <option value="Sports">Sports</option>
+        <option value="Art / Exhibition">Art / Exhibition</option>
+      </select>
+      <select id="locationFilter" onchange="filterEvents()">
+        <option value="">All Locations</option>
+        <option value="New York City">New York City</option>
+        <option value="San Francisco">San Francisco</option>
+        <option value="Los Angeles">Los Angeles</option>
+        <option value="Chicago">Chicago</option>
+        <option value="Miami">Miami</option>
+        <option value="Seattle">Seattle</option>
+        <option value="Boston">Boston</option>
+        <option value="Austin">Austin</option>
+        <option value="Hollywood">Hollywood</option>
+        <option value="Las Vegas">Las Vegas</option>
+      </select>
+    </div>
+
+    <!-- Event cards -->
+    <section id="event-list" class="event-list"></section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p style="text-align:center; padding: 15px;">&copy; 2025 Event Ticket Booking. All rights reserved.</p>
+  </footer>
+
+  <!-- Chatbot Help Button -->
+  <div class="chatbot">
+    <a href="contact.html">💬 Help</a>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button onclick="scrollToTop()" id="scrollTopBtn">↑</button>
+
+  <!-- JavaScript -->
+  <script>
+    const events = [
+  { id: 1, name: "Concert Night", date: "2025-03-15", time: "7:00 PM - 10:00 PM", location: "New York City", category: "Music / Concert", price: 50, tickets: 150, rescheduleDates: ["2025-03-20", "2025-03-25", "2025-03-28", "2025-04-01"] },
+  { id: 2, name: "Tech Conference", date: "2025-04-10", time: "9:00 AM - 5:00 PM", location: "San Francisco", category: "Technology / Conference", price: 150, tickets: 129, rescheduleDates: ["2025-04-15", "2025-04-20", "2025-04-22", "2025-04-25"] },
+  { id: 3, name: "Comedy Show", date: "2025-05-20", time: "8:00 PM - 11:00 PM", location: "Los Angeles", category: "Entertainment / Comedy", price: 75, tickets: 80, rescheduleDates: ["2025-05-25", "2025-05-30", "2025-06-02", "2025-06-05"] },
+  { id: 4, name: "Food Festival", date: "2025-06-10", time: "12:00 PM - 6:00 PM", location: "Chicago", category: "Food / Festival", price: 40, tickets: 90, rescheduleDates: ["2025-06-15", "2025-06-20", "2025-06-22", "2025-06-25"] },
+  { id: 5, name: "Sports Championship", date: "2025-07-05", time: "3:00 PM - 7:00 PM", location: "Miami", category: "Sports", price: 100, tickets: 75, rescheduleDates: ["2025-07-10", "2025-07-15", "2025-07-18", "2025-07-22"] },
+  { id: 6, name: "Art Exhibition", date: "2025-08-12", time: "10:00 AM - 4:00 PM", location: "Seattle", category: "Art / Exhibition", price: 30, tickets: 80, rescheduleDates: ["2025-08-18", "2025-08-25", "2025-08-28", "2025-09-01"] },
+  { id: 7, name: "Book Fair", date: "2025-09-20", time: "11:00 AM - 5:00 PM", location: "Boston", category: "Entertainment / Comedy", price: 20, tickets: 60, rescheduleDates: ["2025-09-25", "2025-09-30", "2025-10-03", "2025-10-06"] },
+  { id: 8, name: "Music Festival", date: "2025-10-05", time: "2:00 PM - 10:00 PM", location: "Austin", category: "Music / Concert", price: 80, tickets: 56, rescheduleDates: ["2025-10-10", "2025-10-15", "2025-10-18", "2025-10-21"] },
+  { id: 9, name: "Film Premiere", date: "2025-11-15", time: "6:00 PM - 9:00 PM", location: "Hollywood", category: "Entertainment / Comedy", price: 60, tickets: 40, rescheduleDates: ["2025-11-20", "2025-11-25", "2025-11-28", "2025-12-01"] },
+  { id: 10, name: "Charity Gala", date: "2025-12-01", time: "7:00 PM - 11:00 PM", location: "Las Vegas", category: "Technology / Conference", price: 200, tickets: 50, rescheduleDates: ["2025-12-05", "2025-12-10", "2025-12-13", "2025-12-17"] }
+];
+
+
+    function renderEvents(eventList = events) {
+      const container = document.getElementById("event-list");
+      container.innerHTML = '';
+      eventList.forEach(event => {
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.innerHTML = `
+          <h3>${event.name}</h3>
+          <p><strong>Date:</strong> ${event.date}</p>
+          <p><strong>Time:</strong> ${event.time}</p>
+          <p><strong>Location:</strong> ${event.location}</p>
+          <p><strong>Category:</strong> ${event.category}</p>
+          <p><strong>Price:</strong> $${event.price}</p>
+          <p><strong>Available Tickets:</strong> ${event.tickets}</p>
+          <label>Select Tickets: 
+            <input type="number" id="qty-${event.id}" value="1" min="1" max="${event.tickets}" onchange="updateTotal(${event.id}, ${event.price})">
+          </label>
+          <p><strong>Total:</strong> $<span id="total-${event.id}">${event.price.toFixed(2)}</span></p>
+          <div class="actions">
+            <button onclick="bookTicket(${event.id})">Book Now</button>
+            <button onclick="toggleReschedule(${event.id})">Reschedule</button>
+          </div>
+          <div id="reschedule-${event.id}" style="display:none; margin-top:10px;">
+            <select id="reschedule-select-${event.id}">
+              ${event.rescheduleDates.map(date => `<option value="${date}">${date}</option>`).join('')}
+            </select>
+            <button onclick="confirmReschedule(${event.id})">Confirm</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateTotal(id, price) {
+      const qty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+      document.getElementById(`total-${id}`).innerText = (qty * price).toFixed(2);
+    }
+
+    function bookTicket(id) {
+      const event = events.find(e => e.id === id);
+      const qty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+      event.selectedQty = qty;
+      localStorage.setItem("selectedEvent", JSON.stringify(event));
+      window.location.href = "checkout.html";
+    }
+
+    function toggleReschedule(id) {
+      const el = document.getElementById(`reschedule-${id}`);
+      el.style.display = (el.style.display === "block") ? "none" : "block";
+    }
+
+    function confirmReschedule(id) {
+      const select = document.querySelector(`#reschedule-${id} select`);
+      alert(`Rescheduled to: ${select.value}`);
+    }
+
+    function searchEvents() {
+      const term = document.getElementById("searchBar").value.toLowerCase();
+      const filtered = events.filter(e => e.name.toLowerCase().includes(term));
+      renderEvents(filtered);
+    }
+
+    function filterEvents() {
+      const type = document.getElementById("eventTypeFilter").value.toLowerCase();
+      const location = document.getElementById("locationFilter").value.toLowerCase();
+      const filtered = events.filter(e =>
+        (!type || e.category.toLowerCase() === type) &&
+        (!location || e.location.toLowerCase().includes(location))
+      );
+      renderEvents(filtered);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const button = document.getElementById('darkModeBtn');
+      button.textContent = document.body.classList.contains('dark-mode') ? "Toggle Light Mode" : "Toggle Dark Mode";
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.onload = () => renderEvents();
+  </script>
+</body>
+</html>
+
+
+
+

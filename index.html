@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Ticket Booking</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul {
+      list-style-type: none;
+      padding: 10px;
+      margin: 0;
+      background-color: #99b122;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li span {
+      color: white;
+      font-weight: bold;
+      font-size: 22px;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+    .dark-mode .container {
+      background-color: #1f1f1f;
+      color: white;
+    }
+
+    .breadcrumb {
+      margin: 10px 20px;
+      font-size: 14px;
+    }
+
+    .breadcrumb a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .container {
+      width: 400px;
+      margin: 50px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button[type="submit"], #darkModeBtn {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 10px auto;
+    }
+
+    button[type="submit"]:hover, #darkModeBtn:hover {
+      background-color: #218838;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .link a {
+      color: #0000EE;
+      text-decoration: underline;
+    }
+
+    .link a:visited {
+      color: #551A8B;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+    }
+
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      padding: 10px 15px;
+      border-radius: 30px;
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 90%;
+        margin: 20px auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation with title -->
+  <nav>
+    <ul>
+      <li><span>EVENT TICKET BOOKING</span></li>
+    </ul>
+  </nav>
+
+  <!-- Dark Mode Toggle Button -->
+  <button onclick="toggleDarkMode()" id="darkModeBtn">Toggle Dark Mode</button>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html"></a> 
+  </div>
+
+  <!-- Login Form -->
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <div style="position: relative;">
+          <input type="password" id="password" name="password" placeholder="Enter your password" required minlength="8" style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+          <button type="button" onclick="togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" style="width: 100%;">Login</button>
+    </form>
+  </div>
+
+  <!-- Floating Chatbot Help Icon -->
+  <div class="chatbot">
+    <a href="contact.html">💬 Help</a>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const button = document.getElementById('darkModeBtn');
+      button.textContent = document.body.classList.contains('dark-mode') ? "Toggle Light Mode" : "Toggle Dark Mode";
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();  // Prevent page refresh
+      alert("Login Successful!"); 
+      window.location.href = "dashboard.html";  // Redirect to dashboard
+    });
+
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+  </script>
+
+</body>
+</html>
+

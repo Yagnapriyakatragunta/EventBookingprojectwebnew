@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Page</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+      background-color: #0071ce;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+
+    form label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    form input[type="text"],
+    form input[type="checkbox"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    form button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #218838;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+    }
+
+    #loading-msg {
+      color: #0071ce;
+      font-weight: bold;
+      margin-top: 20px;
+      display: none;
+    }
+
+    /* Dark mode */
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    .dark-mode input,
+    .dark-mode select,
+    .dark-mode button {
+      background-color: #333;
+      color: white;
+      border: 1px solid #555;
+    }
+
+    .dark-mode .error-message {
+      color: #ff7373;
+    }
+
+    /* Chatbot button */
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      padding: 10px 15px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    .chatbot a {
+      color: white;
+      text-decoration: none;
+    }
+
+    #darkModeBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>EVENT TICKET BOOKING</h1>
+    <h2>Payments</h2>
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="logout.html">Logout</a>
+    </nav>
+  </header>
+
+  <button onclick="toggleDarkMode()" id="darkModeBtn">Toggle Dark Mode</button>
+
+  <section id="payment-page">
+    <h2>Make a Payment</h2>
+    <form id="payment-form">
+      <label for="card-number">Card Number:</label>
+      <input type="text" id="card-number" maxlength="16" required>
+      <small id="card-error" class="error-message"></small>
+
+      <label for="expiry">Expiry Date (MM/YYYY):</label>
+      <input type="text" id="expiry" placeholder="MM/YYYY" required>
+      <small id="expiry-error" class="error-message"></small>
+
+      <label for="cvv">CVV:</label>
+      <input type="text" id="cvv" maxlength="3" required>
+      <small id="cvv-error" class="error-message"></small>
+
+      <label>
+        <input type="checkbox" id="save-details"> Save payment details for future use
+      </label>
+
+      <button type="submit">Pay Now</button>
+    </form>
+
+    <p id="loading-msg">⏳ Processing your payment, please wait...</p>
+  </section>
+
+  <!-- Chatbot Help Button -->
+  <div class="chatbot">
+    <a href="contact.html">💬 Help</a>
+  </div>
+
+  <script>
+    function validateInput(input, pattern, errorElement, errorMessage) {
+      input.addEventListener("input", function () {
+        if (!pattern.test(input.value)) {
+          errorElement.textContent = errorMessage;
+        } else {
+          errorElement.textContent = "";
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const btn = document.getElementById('darkModeBtn');
+      btn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      let cardNumber = document.getElementById('card-number');
+      let expiryDate = document.getElementById('expiry');
+      let cvv = document.getElementById('cvv');
+
+      const saved = JSON.parse(localStorage.getItem('savedPaymentDetails'));
+      if (saved) {
+        cardNumber.value = saved.cardNumber || '';
+        expiryDate.value = saved.expiry || '';
+        cvv.value = saved.cvv || '';
+        document.getElementById('save-details').checked = true;
+      }
+
+      validateInput(cardNumber, /^\d{16}$/, document.getElementById('card-error'), "Invalid card number. Must be exactly 16 digits.");
+      validateInput(cvv, /^\d{3}$/, document.getElementById('cvv-error'), "Invalid CVV. Must be exactly 3 digits.");
+
+      expiryDate.addEventListener("input", function () {
+        let expiryPattern = /^(0[1-9]|1[0-2])\/(\d{4})$/;
+        let errorElement = document.getElementById('expiry-error');
+
+        if (!expiryPattern.test(expiryDate.value)) {
+          errorElement.textContent = "Invalid expiry date. Use MM/YYYY format.";
+        } else {
+          let today = new Date();
+          let currentYear = today.getFullYear();
+          let currentMonth = today.getMonth() + 1;
+
+          let [month, year] = expiryDate.value.split('/').map(num => parseInt(num, 10));
+
+          if (month < 1 || month > 12) {
+            errorElement.textContent = "Invalid month. Must be between 01 and 12.";
+          } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+            errorElement.textContent = "Card expired. Enter a future date.";
+          } else {
+            errorElement.textContent = "";
+          }
+        }
+      });
+    });
+
+    document.getElementById('payment-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let cardNumber = document.getElementById('card-number').value.trim();
+      let expiryDate = document.getElementById('expiry').value.trim();
+      let cvv = document.getElementById('cvv').value.trim();
+      let saveDetails = document.getElementById('save-details').checked;
+
+      let hasErrors =
+        document.getElementById('card-error').textContent ||
+        document.getElementById('expiry-error').textContent ||
+        document.getElementById('cvv-error').textContent;
+
+      if (!hasErrors) {
+        document.getElementById("loading-msg").style.display = "block";
+
+        if (saveDetails) {
+          const paymentInfo = { cardNumber, expiry: expiryDate, cvv };
+          localStorage.setItem('savedPaymentDetails', JSON.stringify(paymentInfo));
+        } else {
+          localStorage.removeItem('savedPaymentDetails');
+        }
+
+        const selectedEvent = JSON.parse(localStorage.getItem("selectedEvent"));
+        if (selectedEvent) {
+          const booked = JSON.parse(localStorage.getItem("bookedTickets")) || [];
+          booked.push(selectedEvent);
+          localStorage.setItem("bookedTickets", JSON.stringify(booked));
+          localStorage.setItem("latestTicket", JSON.stringify(selectedEvent));
+
+          let eventList = JSON.parse(localStorage.getItem("eventList")) || [];
+          const eventIndex = eventList.findIndex(e => 
+            e.name === selectedEvent.name &&
+            e.date === selectedEvent.date &&
+            e.location === selectedEvent.location
+          );
+          if (eventIndex !== -1) {
+            eventList[eventIndex].tickets -= selectedEvent.selectedQty || 1;
+            localStorage.setItem("eventList", JSON.stringify(eventList));
+          }
+
+          localStorage.removeItem("selectedEvent");
+        }
+
+        setTimeout(() => {
+          window.location.href = 'confirmation.html';
+        }, 3500);
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

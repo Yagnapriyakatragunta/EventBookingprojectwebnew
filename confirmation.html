@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+      margin: 0;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+      background-color: #0071ce;
+      padding: 10px;
+      border-radius: 8px;
+      justify-content: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #darkModeBtn {
+      display: block;
+      margin: 20px auto 10px auto;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #confirmation-page {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button-group button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .feedback-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .button-group button:not(.cancel-btn):not(.feedback-btn) {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .confirm-dialog {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+      border-radius: 10px;
+    }
+
+    .confirm-dialog button {
+      margin: 5px;
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    .dark-mode nav ul {
+      background-color: #1e1e1e;
+    }
+
+    .dark-mode #confirmation-page {
+      background-color: #1f1f1f;
+      color: white;
+      box-shadow: none;
+    }
+
+    .dark-mode .confirm-dialog {
+      background-color: #2a2a2a;
+      border-color: #555;
+    }
+
+    .dark-mode button {
+      color: white;
+    }
+
+    .dark-mode .cancel-btn {
+      background-color: #c0392b;
+    }
+
+    .dark-mode .feedback-btn {
+      background-color: #2980b9;
+    }
+
+    .dark-mode .button-group button:not(.cancel-btn):not(.feedback-btn) {
+      background-color: #2ecc71;
+    }
+
+    /* Chatbot / Help Button */
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      padding: 10px 15px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    .chatbot a {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>EVENT TICKET BOOKING</h1>
+    <h2>Confirmation</h2>
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="logout.html">Logout</a>
+    </nav>
+  </header>
+
+  <button id="darkModeBtn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+  <section id="confirmation-page">
+    <h2>🎉 Ticket Booking Successful</h2>
+    <p>Thank you for booking your tickets! Your confirmation details are below:</p>
+    <p><strong>Event:</strong> <span id="event-name"></span></p>
+    <p><strong>Date:</strong> <span id="event-date"></span></p>
+    <p><strong>Location:</strong> <span id="event-location"></span></p>
+    <p><strong>Tickets:</strong> <span id="event-quantity"></span></p>
+    <p><strong>Amount Paid:</strong> <span id="amount"></span></p>
+
+    <div class="button-group">
+      <button onclick="window.location.href='dashboard.html'">Return to Home</button>
+      <button onclick="window.location.href='booked.html'">View My Tickets</button>
+      <button onclick="showCancelConfirmation()" class="cancel-btn">Cancel Booking</button>
+      <button onclick="window.location.href='feedback.html'" class="feedback-btn">Give Feedback</button>
+    </div>
+
+    <div id="cancel-confirm-dialog" class="confirm-dialog">
+      <p>Are you sure you want to cancel your booking?</p>
+      <button onclick="confirmCancel()">Yes, Cancel</button>
+      <button onclick="hideCancelConfirmation()">No, Keep Booking</button>
+    </div>
+  </section>
+
+  <!-- Floating Chatbot Help Button -->
+  <div class="chatbot">
+    <a href="contact.html">💬 Help</a>
+  </div>
+
+  <script>
+    let latestTicket = null;
+    let eventList = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+      latestTicket = JSON.parse(localStorage.getItem("latestTicket"));
+      if (!latestTicket) {
+        const bookedTickets = JSON.parse(localStorage.getItem("bookedTickets")) || [];
+        latestTicket = bookedTickets[bookedTickets.length - 1];
+      }
+
+      eventList = JSON.parse(localStorage.getItem("eventList")) || [];
+
+      if (latestTicket) {
+        const qty = latestTicket.selectedQty || latestTicket.quantity || 1;
+        document.getElementById("event-name").textContent = latestTicket.name;
+        document.getElementById("event-date").textContent = latestTicket.date;
+        document.getElementById("event-location").textContent = latestTicket.location;
+        document.getElementById("event-quantity").textContent = qty;
+        document.getElementById("amount").textContent = `$${(latestTicket.price * qty).toFixed(2)}`;
+      } else {
+        document.getElementById("confirmation-page").innerHTML = "<p>No recent booking found.</p>";
+      }
+    });
+
+    function showCancelConfirmation() {
+      document.getElementById("cancel-confirm-dialog").style.display = "block";
+    }
+
+    function hideCancelConfirmation() {
+      document.getElementById("cancel-confirm-dialog").style.display = "none";
+    }
+
+    function confirmCancel() {
+      if (!latestTicket || !eventList.length) {
+        alert("No booking found to cancel.");
+        return;
+      }
+
+      const index = eventList.findIndex(e =>
+        e.name === latestTicket.name &&
+        e.date === latestTicket.date &&
+        e.location === latestTicket.location
+      );
+
+      if (index !== -1) {
+        eventList[index].tickets = parseInt(eventList[index].tickets) + (parseInt(latestTicket.selectedQty) || 1);
+        localStorage.setItem("eventList", JSON.stringify(eventList));
+      }
+
+      let bookedTickets = JSON.parse(localStorage.getItem("bookedTickets")) || [];
+      bookedTickets = bookedTickets.filter(ticket => ticket.name !== latestTicket.name);
+      localStorage.setItem("bookedTickets", JSON.stringify(bookedTickets));
+      localStorage.removeItem("latestTicket");
+
+      document.getElementById("confirmation-page").innerHTML = `
+        <h2 style="color:red;">❌ Booking Cancelled</h2>
+        <p>Your booking has been successfully cancelled.</p>
+        <button onclick="window.location.href='events.html'">Back to Events</button>
+      `;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const btn = document.getElementById('darkModeBtn');
+      btn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+    }
+  </script>
+</body>
+</html>
+
+
+

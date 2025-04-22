@@ -1,0 +1,97 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Event Ticket Booking</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Dark Mode Styling */
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .dark-mode header {
+            background-color: #1f1f1f;
+        }
+        .chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-size: 20px;
+            z-index: 1000;
+        }
+        .chatbot a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <h1>EVENT TICKET BOOKING</h1>
+        <nav>
+            <a href="dashboard.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="logout.html">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Toggle Dark Mode Button -->
+    <button onclick="toggleDarkMode()" id="darkModeBtn" style="margin: 20px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+        Toggle Dark Mode
+    </button>
+
+    <main>
+        <section>
+            <h2>Upcoming Events</h2>
+            <p>Here you can find the latest events and manage your bookings.</p>
+            <button onclick="viewEvents()">View Events</button>
+            <button onclick="window.location.href='booked.html'">View Booked Tickets</button>
+        </section>
+    </main>
+
+    <!-- Floating Chatbot Help Icon -->
+    <div class="chatbot">
+        <a href="contact.html">💬 Help</a>
+    </div>
+
+    <script>
+        function viewEvents() {
+            window.location.href = "events.html";
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const button = document.getElementById('darkModeBtn');
+            if (document.body.classList.contains('dark-mode')) {
+                button.textContent = "Toggle Light Mode";
+            } else {
+                button.textContent = "Toggle Dark Mode";
+            }
+        }
+
+        // Ensure booked tickets reflect in view tickets
+        document.addEventListener("DOMContentLoaded", function () {
+            let bookedTickets = JSON.parse(localStorage.getItem("bookedTickets")) || [];
+            let events = JSON.parse(localStorage.getItem("events")) || [];
+            
+            bookedTickets.forEach(booked => {
+                let event = events.find(e => e.id === booked.id);
+                if (event) {
+                    event.tickets -= 1; // Reduce available tickets
+                }
+            });
+            
+            localStorage.setItem("events", JSON.stringify(events));
+        });
+    </script>
+</body>
+</html>
